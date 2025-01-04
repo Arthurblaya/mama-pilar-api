@@ -51,6 +51,20 @@ export class Product {
         }
     }
 
+    public static createPartial(
+        existingProduct: Product,
+        partial: any
+    ): Product {
+        return new Product(
+            existingProduct.id,
+            partial.name ?? existingProduct.name,
+            partial.category ?? existingProduct.category,
+            partial.price ?? existingProduct.price,
+            partial.images ?? existingProduct.images,
+            partial.description ?? existingProduct.description
+        );
+    }
+
     public get productId(): string {
         return this.id.value;
     }

@@ -68,27 +68,11 @@ export class InMemoryProductRepository implements ProductRepository {
 
     async update(productId: string, productPartial: Partial<Product>): Promise<void> {
         const existingProduct = this.products.get(productId);
-
         if (!existingProduct) {
             throw new Error(`Product with ID ${productId} does not exist.`);
         }
-
-        const updatedProduct = {
-            ...existingProduct,
-            ...productPartial,
-        };
-
-        this.products.set(
-            productId,
-            Product.create(
-                updatedProduct.productId ?? existingProduct.productId,
-                updatedProduct.productName ?? existingProduct.productName,
-                updatedProduct.productCategory ?? existingProduct.productCategory,
-                updatedProduct.productPrice ?? existingProduct.productPrice,
-                updatedProduct.productImages ?? existingProduct.productImages,
-                updatedProduct.productDescription ?? existingProduct.productDescription
-            )
-        );
+        const updatedProduct = Product.createPartial(existingProduct, productPartial);
+        this.products.set(productId, updatedProduct);
     }
 
     async delete(productId: string): Promise<void> {
