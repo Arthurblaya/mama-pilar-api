@@ -42,9 +42,9 @@ export class ProductsController {
 
     public async create(req: HttpRequest, res: HttpResponse): Promise<void> {
         try {
-            const product = ProductMapper.toDomain(req.body || {});
-            await this.createProduct.execute(product);
-            res.status(201).json({ message: "Product created successfully" });
+            const { name, category, price, images, description } = req.body || {};
+            const productId = await this.createProduct.execute(name, category, price, images, description);
+            res.status(201).json({ message: "Product created successfully", productId });
         } catch (error) {
             res.status(400).json({ error: (error as Error).message });
         }
@@ -52,8 +52,20 @@ export class ProductsController {
 
     public async update(req: HttpRequest, res: HttpResponse): Promise<void> {
         try {
-            const partialProduct = ProductMapper.toPartialDomain(req.body || {});
-            await this.updateProduct.execute(req.params?.id || "", partialProduct);
+            const { id } = req.params as any;
+            const updates = req.body;
+
+            if (!id) {
+                res.status(400).json({ error: "Product ID is required" });
+                return;
+            }
+
+            if (!updates || Object.keys(updates).length === 0) {
+                res.status(400).json({ error: "No updates provided" });
+                return;
+            }
+
+            await this.updateProduct.execute(id, updates);
             res.status(200).json({ message: "Product updated successfully" });
         } catch (error) {
             res.status(400).json({ error: (error as Error).message });

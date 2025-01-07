@@ -5,54 +5,45 @@ export class InMemoryProductRepository implements ProductRepository {
     private products: Map<string, Product> = new Map();
 
     constructor() {
-        const baseProducts = [
+        this.initializeProducts();
+    }
+
+    private initializeProducts(): void {
+        const initialProducts = [
             Product.create(
-                '1',
-                'Botifarra',
-                ['Carns', 'Embotits'],
-                9.99,
-                ['https://example.com/botifarra.jpg'],
-                'Botifarra artesana de porc 100% natural.'
+                "Carne de res",
+                ["carnicería"],
+                10.99,
+                ["https://example.com/carne-de-res.jpg"],
+                "Carne de res fresca de alta calidad."
             ),
             Product.create(
-                '2',
-                'Xurrasco',
-                ['Carns', 'Vedella'],
-                12.49,
-                ['https://example.com/xurrasco.jpg'],
-                'Talls de xurrasco de vedella ideals per a la brasa.'
+                "Pollo entero",
+                ["carnicería"],
+                5.49,
+                ["https://example.com/pollo-entero.jpg"],
+                "Pollo entero ideal para asados."
             ),
             Product.create(
-                '3',
-                'Pollastre sencer',
-                ['Carns', 'Pollastre'],
+                "Costillas de cerdo",
+                ["carnicería"],
                 8.75,
-                ['https://example.com/pollastre.jpg'],
-                'Pollastre sencer criat a l’aire lliure, ideal per rostir.'
+                ["https://example.com/costillas-cerdo.jpg"],
+                "Costillas de cerdo perfectas para barbacoa."
             ),
             Product.create(
-                '4',
-                'Hamburgueses de vedella',
-                ['Carns', 'Preparats'],
-                6.50,
-                ['https://example.com/hamburgueses.jpg'],
-                'Hamburgueses de vedella fetes a mà, amb ingredients frescos.'
-            ),
-            Product.create(
-                '5',
-                'Costelles de porc',
-                ['Carns', 'Porc'],
-                7.30,
-                ['https://example.com/costelles.jpg'],
-                'Costelles de porc fresques, perfectes per a la barbacoa.'
+                "Chorizo artesanal",
+                ["carnicería"],
+                6.25,
+                ["https://example.com/chorizo-artesanal.jpg"],
+                "Chorizo artesanal con especias tradicionales."
             ),
         ];
 
-        baseProducts.forEach((product) => {
+        for (const product of initialProducts) {
             this.products.set(product.productId, product);
-        });
+        }
     }
-
 
     async save(product: Product): Promise<void> {
         this.products.set(product.productId, product);
@@ -66,12 +57,22 @@ export class InMemoryProductRepository implements ProductRepository {
         return Array.from(this.products.values());
     }
 
-    async update(productId: string, productPartial: Partial<Product>): Promise<void> {
-        const existingProduct = this.products.get(productId);
+    async update(
+        productId: string,
+        updates: Record<string, any>
+    ): Promise<void> {
+        const existingProduct = await this.findById(productId);
         if (!existingProduct) {
             throw new Error(`Product with ID ${productId} does not exist.`);
         }
-        const updatedProduct = Product.createPartial(existingProduct, productPartial);
+        const updatedProduct = Product.reconstruct(
+            existingProduct.productId,
+            updates.name !== undefined ? Product.validateProp("name", updates.name) : existingProduct.productName,
+            updates.category !== undefined ? Product.validateProp("category", updates.category) : existingProduct.productCategory,
+            updates.price !== undefined ? Product.validateProp("price", updates.price) : existingProduct.productPrice,
+            updates.images !== undefined ? Product.validateProp("images", updates.images) : existingProduct.productImages,
+            updates.description !== undefined ? Product.validateProp("description", updates.description) : existingProduct.productDescription
+        );
         this.products.set(productId, updatedProduct);
     }
 
