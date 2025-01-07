@@ -4,7 +4,8 @@
   "description": "A REST API for product management in an e-commerce system, built with Node.js and Express, following Clean Architecture and Domain-Driven Design (DDD) principles. Designed to scale and integrate with other microservices, it supports basic product CRUD operations and future extensions like integration events, image handling, and email services.",
   "main": "main.js",
   "scripts": {
-    "start": "tsc && node ./dist/main.js"
+    "start": "tsc && node ./dist/main.js",
+    "dev": "tsc && node --env-file=.env.local ./dist/main.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,7 @@
   },
   "dependencies": {
     "express": "^4.21.2",
+    "mongodb": "^6.12.0",
     "uuid": "^11.0.4"
   }
 }

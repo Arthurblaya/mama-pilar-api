@@ -3,23 +3,21 @@ import { ProductsRouter } from "./Products/Infraestructure/routers/products-rout
 
 class Main {
     static async init() {
-        console.log("Iniciant l'aplicació...");
-
         const app = express();
         app.use(express.json());
 
         try {
-            console.log("Configurant rutes...");
-            const productsRouter = new ProductsRouter();
+            const productsRouter = await ProductsRouter.create();
             app.use("/products", productsRouter.getRouter());
 
             const PORT = process.env.PORT || 3000;
             app.listen(PORT, () => {
-                console.log(`Servidor inicialitzat correctament al port ${PORT}`);
+                console.log(`Server running on port ${PORT}`);
             });
         } catch (error) {
-            console.error("Error inicialitzant l'aplicació:", error);
+            console.error("Error initializing application:", error);
         }
     }
 }
+
 Main.init();

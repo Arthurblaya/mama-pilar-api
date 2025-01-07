@@ -5,7 +5,8 @@ import { GetProductById } from "../../Application/UseCases/get-product-by-id";
 import { CreateProduct } from "../../Application/UseCases/create-product";
 import { UpdateProduct } from "../../Application/UseCases/update-product";
 import { DeleteProduct } from "../../Application/UseCases/delete-product";
-import { InMemoryProductRepository } from "../in-memmory-product-repository";
+import { MongoProductRepository } from "../mongo-product-repository";
+import { MongoConfig } from "../config/mongo";
 import { HttpRequest } from "../../../Shared/http-request";
 import { HttpResponse } from "../../../Shared/http-response";
 
@@ -13,9 +14,7 @@ export class ProductsRouter {
     private readonly router: Router;
     private readonly productsController: ProductsController;
 
-    constructor() {
-        const productRepository = new InMemoryProductRepository();
-
+    private constructor(productRepository: MongoProductRepository) {
         this.productsController = new ProductsController(
             new GetAllProducts(productRepository),
             new GetProductById(productRepository),
@@ -26,6 +25,12 @@ export class ProductsRouter {
 
         this.router = express.Router();
         this.setupRoutes();
+    }
+
+    public static async create(): Promise<ProductsRouter> {
+        const db = await MongoConfig.connect();
+        const productRepository = new MongoProductRepository(db);
+        return new ProductsRouter(productRepository);
     }
 
     private setupRoutes(): void {
