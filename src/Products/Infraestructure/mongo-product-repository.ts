@@ -1,10 +1,9 @@
 import { ProductRepository } from "../Domain/product-repository";
 import { Product } from "../Domain/product";
-import { Collection, Db, ObjectId } from "mongodb";
+import { Collection, Db } from "mongodb";
 
 export class MongoProductRepository implements ProductRepository {
-    private readonly collection: Collection;
-
+    private collection: Collection<{ _id: string, name: string, category: string[], price: number, images: string[], description: string }>;
     constructor(db: Db) {
         this.collection = db.collection("products");
     }
@@ -22,7 +21,7 @@ export class MongoProductRepository implements ProductRepository {
     }
 
     async findById(productId: string): Promise<Product | null> {
-        const document = await this.collection.findOne({ _id: new ObjectId(productId) });
+        const document = await this.collection.findOne({ _id: productId });
         if (!document) return null;
 
         return Product.reconstruct(
@@ -56,15 +55,16 @@ export class MongoProductRepository implements ProductRepository {
         }
 
         await this.collection.updateOne(
-            { _id: new ObjectId(productId) },
+            { _id: productId },
             { $set: validatedUpdates }
         );
     }
 
     async delete(productId: string): Promise<void> {
-        const result = await this.collection.deleteOne({ _id: new ObjectId(productId) });
+        const result = await this.collection.deleteOne({ _id: productId });
         if (result.deletedCount === 0) {
             throw new Error(`Product with ID ${productId} does not exist.`);
         }
     }
+
 }

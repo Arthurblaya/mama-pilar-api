@@ -5,6 +5,7 @@ import { ProductPrice } from "./product-price";
 import { ProductImages } from "./product-images";
 import { ProductDescription } from "./product-description";
 import { v4 as uuidv4 } from "uuid";
+import { ProductBinaryImage } from "./product-binary-image";
 
 export class Product {
     private readonly id: ProductId;
@@ -82,6 +83,14 @@ export class Product {
         }
     }
 
+    public static validateBinaryImages(images: Buffer[]): boolean {
+        try {
+            images.forEach((image) => ProductBinaryImage.create(image));
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
 
     public get productId(): string {
         return this.id.value;

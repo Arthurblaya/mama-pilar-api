@@ -9,16 +9,18 @@ import { MongoProductRepository } from "../mongo-product-repository";
 import { MongoConfig } from "../config/mongo";
 import { HttpRequest } from "../../../Shared/http-request";
 import { HttpResponse } from "../../../Shared/http-response";
+import { MinioService } from "../minio-storage-service";
+import { MinioConfig } from "../config/minio";
 
 export class ProductsRouter {
     private readonly router: Router;
     private readonly productsController: ProductsController;
 
-    private constructor(productRepository: MongoProductRepository) {
+    private constructor(productRepository: MongoProductRepository, storageService: MinioService) {
         this.productsController = new ProductsController(
             new GetAllProducts(productRepository),
             new GetProductById(productRepository),
-            new CreateProduct(productRepository),
+            new CreateProduct(productRepository, storageService),
             new UpdateProduct(productRepository),
             new DeleteProduct(productRepository)
         );
@@ -30,7 +32,9 @@ export class ProductsRouter {
     public static async create(): Promise<ProductsRouter> {
         const db = await MongoConfig.connect();
         const productRepository = new MongoProductRepository(db);
-        return new ProductsRouter(productRepository);
+        MinioConfig.initialize();
+        const storageService = new MinioService();
+        return new ProductsRouter(productRepository, storageService);
     }
 
     private setupRoutes(): void {

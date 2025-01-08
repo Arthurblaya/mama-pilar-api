@@ -13,7 +13,14 @@ export class ProductImages {
     }
 
     private static isValidUrl(url: string): boolean {
-        const urlPattern = new RegExp('^(https?:\\/\\/)?([\\da-z.-]+)\\.([a-z.]{2,6})([\\/\\w .-]*)*\\/?$');
+        const urlPattern = new RegExp(
+            '^(https?:\\/\\/)' +
+            '((\\d{1,3}\\.){3}\\d{1,3}|' +
+            '([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}))' +
+            '(\\:\\d{1,5})?' +
+            '(\\/.*)?$',
+            'i'
+        );
         return urlPattern.test(url);
     }
 

@@ -43,7 +43,23 @@ export class ProductsController {
     public async create(req: HttpRequest, res: HttpResponse): Promise<void> {
         try {
             const { name, category, price, images, description } = req.body || {};
-            const productId = await this.createProduct.execute(name, category, price, images, description);
+
+            if (!images || !Array.isArray(images)) {
+                throw new Error("Images are required and must be provided as base64 strings.");
+            }
+
+            const binaryImages = images.map((imageBase64: string) => Buffer.from(imageBase64, "base64"));
+            const mimeTypes = images.map(() => "image/jpeg");
+
+            const productId = await this.createProduct.execute(
+                name,
+                category,
+                price,
+                binaryImages,
+                mimeTypes,
+                description
+            );
+
             res.status(201).json({ message: "Product created successfully", productId });
         } catch (error) {
             res.status(400).json({ error: (error as Error).message });

@@ -3,8 +3,9 @@ import { ProductsRouter } from "./Products/Infraestructure/routers/products-rout
 
 class Main {
     static async init() {
-        const app = express();
-        app.use(express.json());
+        const app = express();        
+        app.use(express.json({ limit: "10mb" }));
+        app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
         try {
             const productsRouter = await ProductsRouter.create();
