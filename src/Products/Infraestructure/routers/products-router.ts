@@ -21,7 +21,7 @@ export class ProductsRouter {
             new GetAllProducts(productRepository),
             new GetProductById(productRepository),
             new CreateProduct(productRepository, storageService),
-            new UpdateProduct(productRepository),
+            new UpdateProduct(productRepository, storageService),
             new DeleteProduct(productRepository, storageService)
         );
 

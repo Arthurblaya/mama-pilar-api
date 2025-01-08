@@ -76,17 +76,23 @@ export class ProductsController {
                 return;
             }
 
-            if (!updates || Object.keys(updates).length === 0) {
-                res.status(400).json({ error: "No updates provided" });
-                return;
+            if (updates.images) {
+                const binaryImages = updates.images.map((imageBase64: string) => ({
+                    buffer: Buffer.from(imageBase64, "base64"),
+                    mimeType: "image/jpeg",
+                }));
+
+                updates.images = binaryImages;
             }
 
             await this.updateProduct.execute(id, updates);
             res.status(200).json({ message: "Product updated successfully" });
         } catch (error) {
+            console.error("Error in update controller:", error);
             res.status(400).json({ error: (error as Error).message });
         }
     }
+
 
     public async delete(req: HttpRequest, res: HttpResponse): Promise<void> {
         try {
