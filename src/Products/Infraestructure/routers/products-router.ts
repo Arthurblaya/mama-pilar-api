@@ -22,7 +22,7 @@ export class ProductsRouter {
             new GetProductById(productRepository),
             new CreateProduct(productRepository, storageService),
             new UpdateProduct(productRepository),
-            new DeleteProduct(productRepository)
+            new DeleteProduct(productRepository, storageService)
         );
 
         this.router = express.Router();
