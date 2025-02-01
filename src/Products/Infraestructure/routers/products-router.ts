@@ -11,6 +11,7 @@ import { HttpRequest } from "../../../Shared/http-request";
 import { HttpResponse } from "../../../Shared/http-response";
 import { MinioService } from "../minio-storage-service";
 import { MinioConfig } from "../config/minio";
+import { apiKeyMiddleware } from "../../../Shared/middleware/auth-middleware";
 
 export class ProductsRouter {
     private readonly router: Router;
@@ -38,12 +39,13 @@ export class ProductsRouter {
     }
 
     private setupRoutes(): void {
-        this.router.get("/", (req, res) => this.handle(req, res, "getAll"));
-        this.router.get("/:id", (req, res) => this.handle(req, res, "getById"));
-        this.router.post("/", (req, res) => this.handle(req, res, "create"));
-        this.router.put("/:id", (req, res) => this.handle(req, res, "update"));
-        this.router.delete("/:id", (req, res) => this.handle(req, res, "delete"));
+        this.router.get("/", apiKeyMiddleware, (req, res) => this.handle(req, res, "getAll"));
+        this.router.get("/:id", apiKeyMiddleware, (req, res) => this.handle(req, res, "getById"));
+        this.router.post("/", apiKeyMiddleware, (req, res) => this.handle(req, res, "create"));
+        this.router.put("/:id", apiKeyMiddleware, (req, res) => this.handle(req, res, "update"));
+        this.router.delete("/:id", apiKeyMiddleware, (req, res) => this.handle(req, res, "delete"));
     }
+    
 
     public getRouter(): Router {
         return this.router;
