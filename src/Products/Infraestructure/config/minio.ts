@@ -7,7 +7,6 @@ export class MinioConfig {
         if (!this.client) {
             this.client = new Client({
                 endPoint: process.env.MINIO_ENDPOINT!,
-                port: parseInt(process.env.MINIO_PORT!, 10),
                 useSSL: process.env.MINIO_USE_SSL === "true",
                 accessKey: process.env.MINIO_ACCESS_KEY!,
                 secretKey: process.env.MINIO_SECRET_KEY!,
@@ -28,6 +27,6 @@ export class MinioConfig {
 
     public static getBaseUrl(): string {
         const protocol = process.env.MINIO_USE_SSL === "true" ? "https" : "http";
-        return `${protocol}://${process.env.MINIO_ENDPOINT}:${process.env.MINIO_PORT}`;
+        return `${protocol}://${process.env.MINIO_ENDPOINT}`;
     }
 }
